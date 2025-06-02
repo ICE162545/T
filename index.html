@@ -199,6 +199,8 @@
       left: 0; top: 0; width: 100vw; height: 100vh;
       z-index: 0;
       pointer-events: none;
+      opacity: 0; /* Initially hidden */
+      transition: opacity 1s ease-in-out; /* For fade-in effect */
     }
     .cloud {
       position: absolute;
@@ -561,11 +563,25 @@
           i++;
           setTimeout(typeWriter, 80); // เพิ่มความล่าช้าเป็น 80ms ต่อตัวอักษร
         } else {
-          startImageSlideshow(); // Start slideshow after typing is done
-          // ADDED: Play video after slideshow starts
+          startImageSlideshow(); // เริ่มสไลด์โชว์หลังจากพิมพ์เสร็จ
+
           const videoBg = document.getElementById('cardVideoBg');
+          const floatingBg = document.getElementById('floatingBg'); // Get floatingBg element
+
           if (videoBg && CARD.videoSrc && CARD.videoSrc !== 'YOUR_VIDEO_URL_HERE.mp4') {
-            videoBg.play().catch(error => console.log("Error attempting to play video after slideshow:", error));
+            setTimeout(() => {
+              videoBg.play().catch(error => console.log("Error attempting to play video after slideshow:", error));
+              if (floatingBg) {
+                floatingBg.style.opacity = 1; // Show floating background
+              }
+            }, 850); // Delay to match image fade-in and video start
+          } else {
+            // If no video, show floating background after a similar delay for image slideshow to appear
+            if (floatingBg) {
+              setTimeout(() => {
+                floatingBg.style.opacity = 1; // Show floating background
+              }, 850); // Match delay for consistency
+            }
           }
         }
       }
