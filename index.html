@@ -274,6 +274,18 @@
     .slide-image.right {
       right: 0;
     }
+
+    /* Video Background for cardPage */
+    #cardVideoBg {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      object-fit: cover; /* Cover the entire container */
+      z-index: -1; /* Place it behind other content */
+      opacity: 0.5; /* Optional: make it less prominent */
+    }
   </style>
   <script>
     // ถ้าเปลี่ยน title แล้วไม่ขึ้น ให้ลอง hard refresh (Ctrl+F5 หรือ Cmd+Shift+R)
@@ -344,6 +356,10 @@
   </div>
 
   <div class="container fade hidden" id="cardPage">
+    <!-- Video Background -->
+    <video autoplay muted loop id="cardVideoBg">
+      <!-- Source will be set by JavaScript -->
+    </video>
     <!-- ===== ดาวตกพื้นหลัง (ขอบซ้าย-ขวา) ===== -->
     <canvas id="starsBg" style="position:fixed;z-index:0;left:0;top:0;width:100vw;height:100vh;pointer-events:none;"></canvas>
     <h2>Happy Birthday Kub</h2>
@@ -383,7 +399,11 @@
         'https://i.postimg.cc/4ygyCR1P/A52-AE1-B9-67-E5-445-F-8814-7-F07-CA8098-FF.jpg',
         'https://i.postimg.cc/vB1f8yfd/5672182-F-CC1-C-4510-AA6-B-3-EB79-A22-D657.jpg',
         'https://i.postimg.cc/QdX7911m/01620175-DCAF-4646-A177-E19-BC626-FEED.jpg'
-      ]
+      ],
+      // ===== ใส่ URL ของวิดีโอพื้นหลังสำหรับ cardPage ที่นี่ =====
+      // ===== VV IMPORTANT VV =====
+      // ===== PASTE YOUR VIDEO URL BELOW (e.g., 'https://example.com/myvideo.mp4') =====
+      videoSrc: 'copy_EC9CCA99-4D3E-4446-93E9-EE1376BA9B2A.mp4' // <<<<<<< ADD YOUR VIDEO URL HERE
     };
     const PASSWORD = '24062544';
 
@@ -501,6 +521,20 @@
     // --- Show Card ---
     const output = document.getElementById('output');
     function showCard() {
+      // Set video background source
+      const videoBg = document.getElementById('cardVideoBg');
+      if (videoBg && CARD.videoSrc && CARD.videoSrc !== 'YOUR_VIDEO_URL_HERE.mp4') {
+        const sourceElement = document.createElement('source');
+        sourceElement.src = CARD.videoSrc;
+        sourceElement.type = 'video/mp4'; // Assuming mp4, adjust if needed
+        videoBg.innerHTML = ''; // Clear existing sources
+        videoBg.appendChild(sourceElement);
+        videoBg.load(); // Important to load the new source
+        videoBg.play().catch(error => console.log("Autoplay prevented for video:", error));
+      } else if (videoBg) {
+        videoBg.style.display = 'none'; // Hide if no video src
+      }
+
       output.innerHTML = `
         <div style="position:relative;">
           <h2 style="color:#4f8cff;">สุขสันต์วันเกิด ${receiverName}!</h2>
@@ -524,10 +558,11 @@
           wishElem.textContent = wishText.slice(0, i);
           i++;
           setTimeout(typeWriter, 80); // เพิ่มความล่าช้าเป็น 80ms ต่อตัวอักษร
+        } else {
+          startImageSlideshow(); // Start slideshow after typing is done
         }
       }
       typeWriter();
-      startImageSlideshow(); // เริ่มสไลด์โชว์
     }
 
     // --- Music ---
