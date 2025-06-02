@@ -357,7 +357,7 @@
 
   <div class="container fade hidden" id="cardPage">
     <!-- Video Background -->
-    <video autoplay muted loop id="cardVideoBg">
+    <video muted loop id="cardVideoBg">
       <!-- Source will be set by JavaScript -->
     </video>
     <!-- ===== ดาวตกพื้นหลัง (ขอบซ้าย-ขวา) ===== -->
@@ -530,7 +530,6 @@
         videoBg.innerHTML = ''; // Clear existing sources
         videoBg.appendChild(sourceElement);
         videoBg.load(); // Important to load the new source
-        videoBg.play().catch(error => console.log("Autoplay prevented for video:", error));
       } else if (videoBg) {
         videoBg.style.display = 'none'; // Hide if no video src
       }
@@ -560,6 +559,11 @@
           setTimeout(typeWriter, 80); // เพิ่มความล่าช้าเป็น 80ms ต่อตัวอักษร
         } else {
           startImageSlideshow(); // Start slideshow after typing is done
+          // ADDED: Play video after slideshow starts
+          const videoBg = document.getElementById('cardVideoBg');
+          if (videoBg && CARD.videoSrc && CARD.videoSrc !== 'YOUR_VIDEO_URL_HERE.mp4') {
+            videoBg.play().catch(error => console.log("Error attempting to play video after slideshow:", error));
+          }
         }
       }
       typeWriter();
