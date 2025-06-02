@@ -87,6 +87,7 @@
       position: relative;
       animation: fadeIn 1s, pastelGlow 3.5s linear infinite alternate;
       border: 3px solid #aeefff;
+      overflow: hidden;
     }
     @keyframes pastelGlow {
       0% { box-shadow: 0 2px 16px #ffd6ec44, 0 0 0 4px #aeefff44; border-color: #aeefff; }
@@ -244,6 +245,35 @@
     .heart2 { left: 30vw; top: 80vh; background: #aeefff; animation: heartMove2 36s linear infinite; }
     @keyframes heartMove1 { 0%{top:10vh;} 100%{top:70vh;} }
     @keyframes heartMove2 { 0%{top:80vh;} 100%{top:20vh;} }
+    /* Slideshow styles */
+    #imageSlideshow {
+      display: flex;
+      justify-content: space-around; /* Distribute space for 2 images */
+      align-items: center;
+      margin-top: 18px;
+      width: 100%;
+      height: 200px; /* Adjust as needed */
+      position: relative;
+    }
+    .slide-image {
+      width: 48%; /* Each image takes almost half */
+      height: 100%;
+      object-fit: contain; /* Show full image, might have letterboxing */
+      border-radius: 12px;
+      box-shadow: 0 2px 8px #aeefff66;
+      opacity: 0;
+      transition: opacity 0.8s ease-in-out;
+      position: absolute; /* For stacking and fading */
+    }
+    .slide-image.active {
+      opacity: 1;
+    }
+    .slide-image.left {
+      left: 0;
+    }
+    .slide-image.right {
+      right: 0;
+    }
   </style>
   <script>
     // ถ้าเปลี่ยน title แล้วไม่ขึ้น ให้ลอง hard refresh (Ctrl+F5 หรือ Cmd+Shift+R)
@@ -256,9 +286,9 @@
     <h1>ล็อกอินเลยไอ้อ้วน</h1>
     <form id="loginForm">
       <label for="receiver">NAME</label>
-      <input type="text" id="receiver" required placeholder="ภาษาอังกฤษพิมพ์เล็กทั้งหมด">
+      <input type="text" id="receiver" required placeholder="user">
       <label for="password">PASSWORD</label>
-      <input type="password" id="password" required placeholder="ใส่วันเกิดเธอแหละวันเดือนปี">
+      <input type="password" id="password" required placeholder="password">
       <div class="error" id="loginError" style="display:none;"></div>
       <button type="submit">Login</button>
     </form>
@@ -307,7 +337,8 @@
     <div style="margin-top:18px;">
       <!-- ใช้ audio เดียวสำหรับทั้ง 2 หน้า -->
       <audio id="bgMusic" loop>
-        <source src="https://ice162545.github.io/m/" type="audio/mp3">
+        <!-- ===== ใส่ URL ของเพลงที่นี่ ===== -->
+        <source src="Music.mp3" type="audio/mpeg">
       </audio>
     </div>
   </div>
@@ -341,11 +372,20 @@
     // ตั้งค่าข้อมูลการ์ดอวยพรที่ผู้รับจะเห็น
     const CARD = {
       sender: 'ICE🤍🤏', // ชื่อผู้ส่ง
-      wish: 'ขอให้มีความสุขมากๆ สมหวังในทุกสิ่งที่ตั้งใจ สุขภาพแข็งแรง น่ารักแบบนี้ตลอดไปนะคะ 💖',
+      wish: 'ขอให้เธอมีความสุขมากๆ สมหวังในทุกสิ่งที่ตั้งใจ สุขภาพแข็งแรง น่ารักแบบนี้ตลอดไปเลยนะ 💖',
       // ===== เปลี่ยนลิงก์รูปภาพการ์ดอวยพรตรงนี้ =====
-      photo: 'https://cdn.pixabay.com/photo/2016/11/29/12/54/birthday-1869260_1280.jpg'
+      photo: 'https://cdn.pixabay.com/photo/2016/11/29/12/54/birthday-1869260_1280.jpg',
+      // ===== รูปภาพสำหรับสไลด์โชว์ (ใส่ URL ของรูปภาพที่นี่) =====
+      slideshowImages: [
+        'https://i.imgur.com/4Lp6xOE.png',  // Cloud image 1
+        'https://i.imgur.com/yVRdffs.png',  // Cloud image 2
+        'https://i.postimg.cc/KYTmmsjH/IMG-0292.jpg',
+        'https://i.postimg.cc/4ygyCR1P/A52-AE1-B9-67-E5-445-F-8814-7-F07-CA8098-FF.jpg',
+        'https://i.postimg.cc/vB1f8yfd/5672182-F-CC1-C-4510-AA6-B-3-EB79-A22-D657.jpg',
+        'https://i.postimg.cc/QdX7911m/01620175-DCAF-4646-A177-E19-BC626-FEED.jpg'
+      ]
     };
-    const PASSWORD = '240644';
+    const PASSWORD = '24062544';
 
     // --- Login Logic ---
     const loginPage = document.getElementById('loginPage');
@@ -466,10 +506,10 @@
           <h2 style="color:#4f8cff;">สุขสันต์วันเกิด ${receiverName}!</h2>
           <p id="typewriterWish" style="color:#ff7eb9;font-size:1.1rem;min-height:2.5em;"></p>
           <div style="margin-top:10px;color:#aeefff;font-size:1rem;">จาก ${CARD.sender}</div>
-          <video id="hbdVideo" controls style="margin-top:18px;max-width:100%;border-radius:16px;box-shadow:0 2px 8px #aeefff44;">
-            <source src="https://www.w3schools.com/html/mov_bbb.mp4" type="video/mp4">
-            Your browser does not support the video tag.
-          </video>
+          <!-- ===== ส่วนแสดงสไลด์รูปภาพ ===== -->
+          <div id="imageSlideshow">
+            <!-- Images will be inserted here by JavaScript -->
+          </div>
         </div>
       `;
       output.style.display = 'block';
@@ -483,10 +523,11 @@
         if (i <= wishText.length) {
           wishElem.textContent = wishText.slice(0, i);
           i++;
-          setTimeout(typeWriter, 32);
+          setTimeout(typeWriter, 80); // เพิ่มความล่าช้าเป็น 80ms ต่อตัวอักษร
         }
       }
       typeWriter();
+      startImageSlideshow(); // เริ่มสไลด์โชว์
     }
 
     // --- Music ---
@@ -616,6 +657,95 @@
     cardPage.addEventListener('transitionstart', startShootingStars);
     // หรือถ้าอยากให้เริ่มทันทีที่โหลด cardPage
     // startShootingStars();
+
+    // ===== Logic สำหรับสไลด์รูปภาพ =====
+    let slideInterval;
+    let currentSlideIndices = [0, 1]; // Indices of the two images currently shown
+
+    function startImageSlideshow() {
+      const slideshowContainer = document.getElementById('imageSlideshow');
+      if (!slideshowContainer || CARD.slideshowImages.length < 2) {
+        if (slideshowContainer) slideshowContainer.innerHTML = '<p style="color:#ff7eb9;">ต้องการรูปอย่างน้อย 2 รูปสำหรับสไลด์โชว์</p>';
+        return;
+      }
+
+      // Preload images for smoother transitions (optional but good practice)
+      CARD.slideshowImages.forEach(src => {
+        const img = new Image();
+        img.src = src;
+      });
+
+      function updateSlides() {
+        slideshowContainer.innerHTML = ''; // Clear previous images
+
+        const img1 = document.createElement('img');
+        img1.src = CARD.slideshowImages[currentSlideIndices[0]];
+        img1.alt = 'Slideshow image 1';
+        img1.className = 'slide-image left';
+
+        const img2 = document.createElement('img');
+        img2.src = CARD.slideshowImages[currentSlideIndices[1]];
+        img2.alt = 'Slideshow image 2';
+        img2.className = 'slide-image right';
+
+        slideshowContainer.appendChild(img1);
+        slideshowContainer.appendChild(img2);
+
+        // Trigger fade-in
+        setTimeout(() => {
+          img1.classList.add('active');
+          img2.classList.add('active');
+        }, 50); // Small delay to allow CSS to apply initial opacity 0
+
+        // Prepare next indices
+        currentSlideIndices[0] = (currentSlideIndices[0] + 2) % CARD.slideshowImages.length;
+        currentSlideIndices[1] = (currentSlideIndices[1] + 2) % CARD.slideshowImages.length;
+        
+        // Handle cases with odd number of images for the last pair
+        if (currentSlideIndices[0] === currentSlideIndices[1] && CARD.slideshowImages.length > 1) {
+            currentSlideIndices[1] = (currentSlideIndices[1] + 1) % CARD.slideshowImages.length;
+            if (currentSlideIndices[1] === currentSlideIndices[0]) { // if still same (e.g. length 1 or 2)
+              if(CARD.slideshowImages.length > 1) currentSlideIndices[1] = (currentSlideIndices[0] + 1) % CARD.slideshowImages.length;
+              else currentSlideIndices[1] = currentSlideIndices[0]; // just repeat if only 1 image
+            }
+        }
+        if (currentSlideIndices[0] >= CARD.slideshowImages.length) currentSlideIndices[0] = 0;
+        if (currentSlideIndices[1] >= CARD.slideshowImages.length) {
+            currentSlideIndices[1] = (currentSlideIndices[0] + 1) % CARD.slideshowImages.length;
+            if (currentSlideIndices[0] === currentSlideIndices[1] && CARD.slideshowImages.length > 1) {
+               currentSlideIndices[1] = 0; // loop back for second image if first is last
+            } else if (CARD.slideshowImages.length <=1){
+              currentSlideIndices[1] = currentSlideIndices[0];
+            }
+        }
+
+
+      }
+
+      updateSlides(); // Initial display
+
+      if (slideInterval) clearInterval(slideInterval);
+      if (CARD.slideshowImages.length > 2 || (CARD.slideshowImages.length === 2 && currentSlideIndices[0] !== 0)) { // only interval if more than 2 images or if we want to swap the initial 2
+          slideInterval = setInterval(updateSlides, 3000); // Change images every 3 seconds
+      } else if (CARD.slideshowImages.length <= 1) {
+          // If only one image, no need to interval, or handle as a static display
+          if(CARD.slideshowImages.length === 1) { // display single image if only one
+               slideshowContainer.innerHTML = '';
+               const img = document.createElement('img');
+               img.src = CARD.slideshowImages[0];
+               img.alt = 'Slideshow image';
+               img.className = 'slide-image active';
+               img.style.width = '90%'; // Center single image
+               img.style.position = 'relative';
+               slideshowContainer.appendChild(img);
+          }
+      }
+    }
+
+    // Ensure slideshow stops if user navigates away (e.g., reloads, goes back)
+    window.addEventListener('beforeunload', () => {
+      if (slideInterval) clearInterval(slideInterval);
+    });
   </script>
 </body>
 </html> 
